@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Special Question 💕</title>
+    <title>Something Special 💕</title>
     <style>
         * {
             margin: 0;
@@ -136,6 +136,13 @@
             transition: opacity 0.3s ease;
         }
 
+        .message-box {
+            font-size: 18px;
+            color: #d63384;
+            margin-top: 12px;
+            min-height: 56px;
+        }
+
         .shy-caption.visible {
             opacity: 1;
         }
@@ -253,6 +260,7 @@
                     <button class="btn btn-no" id="noBtn">No 💔</button>
                 </div>
                 <p class="shy-caption" id="shyCaption">"No" seems a bit shy 😈</p>
+                <p class="message-box" id="messageBox" aria-live="polite"></p>
             </div>
             
             <div class="celebration" id="celebration">
@@ -319,12 +327,34 @@
         // Yes button is ready immediately with pulse animation
         yesBtn.classList.add('pulse-animation');
 
-        // Yes button click - Success state
+        // Sequential messages to show on each Yes click, then celebration
+        const messages = [
+            "You don’t just bring happiness to my life; you are the reason my life feels complete.",
+            "Life with you is my favorite adventure. Thank you for being my constant smile.",
+            "Every day I spend with you becomes the new best day of my life.",
+            "Baby, you’re the 'Yes' I’ve been looking for my whole life. (Even if I had to wait 10 years for it!)"
+        ];
+
+        const messageBox = document.getElementById('messageBox');
+        let messageIndex = 0;
+
         yesBtn.addEventListener('click', () => {
-            initialContent.classList.add('hidden');
-            celebration.classList.add('active');
-            noBtn.style.display = 'none';
-            triggerConfetti();
+            // If there are still messages left, show the next one
+            if (messageIndex < messages.length) {
+                messageBox.textContent = messages[messageIndex];
+                messageIndex++;
+
+                // After showing the final message, change the Yes button label to indicate final step
+                if (messageIndex === messages.length) {
+                    yesBtn.textContent = 'Celebrate 🎉';
+                }
+            } else {
+                // All messages shown -> show celebration
+                initialContent.classList.add('hidden');
+                celebration.classList.add('active');
+                noBtn.style.display = 'none';
+                triggerConfetti();
+            }
         });
 
         // Confetti effect
