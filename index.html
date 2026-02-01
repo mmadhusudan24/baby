@@ -143,6 +143,37 @@
             min-height: 56px;
         }
 
+        .message-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .message-screen.active {
+            display: block;
+        }
+
+        .message-emoji {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+
+        .message-text {
+            font-size: 20px;
+            color: #d63384;
+            margin: 18px 0;
+            min-height: 84px;
+            padding: 0 10px;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #ff9bbd 0%, #ff6b9d 100%);
+            color: white;
+            padding: 12px 36px;
+            border-radius: 40px;
+            font-size: 18px;
+            box-shadow: 0 6px 22px rgba(255, 107, 157, 0.35);
+        }
+
         .shy-caption.visible {
             opacity: 1;
         }
@@ -260,13 +291,20 @@
                     <button class="btn btn-no" id="noBtn">No 💔</button>
                 </div>
                 <p class="shy-caption" id="shyCaption">"No" seems a bit shy 😈</p>
-                <p class="message-box" id="messageBox" aria-live="polite"></p>
+                <!-- messageBox removed; messages will appear on a dedicated message screen -->
             </div>
             
             <div class="celebration" id="celebration">
                 <div class="celebration-emoji">💕🎉💕</div>
                 <h1 class="celebration-text">Yay! ❤️</h1>
                 <p class="celebration-subtext">I knew you'd say yes! 🥰</p>
+            </div>
+
+            <!-- Message screen shown after clicking Yes; user advances with Next button -->
+            <div class="message-screen" id="messageScreen">
+                <div class="message-emoji">💌</div>
+                <p class="message-text" id="messageText" aria-live="polite"></p>
+                <button class="btn btn-next" id="nextBtn">Next 💌</button>
             </div>
         </div>
     </div>
@@ -327,7 +365,7 @@
         // Yes button is ready immediately with pulse animation
         yesBtn.classList.add('pulse-animation');
 
-        // Sequential messages to show on each Yes click, then celebration
+        // Messages to show sequentially on their own screen
         const messages = [
             "You don’t just bring happiness to my life; you are the reason my life feels complete.",
             "Life with you is my favorite adventure. Thank you for being my constant smile.",
@@ -335,24 +373,32 @@
             "Baby, you’re the 'Yes' I’ve been looking for my whole life. (Even if I had to wait 10 years for it!)"
         ];
 
-        const messageBox = document.getElementById('messageBox');
+        const messageScreen = document.getElementById('messageScreen');
+        const messageText = document.getElementById('messageText');
+        const nextBtn = document.getElementById('nextBtn');
         let messageIndex = 0;
 
+        // Start the message flow: hide initial card, show message screen with first message
         yesBtn.addEventListener('click', () => {
-            // If there are still messages left, show the next one
-            if (messageIndex < messages.length) {
-                messageBox.textContent = messages[messageIndex];
-                messageIndex++;
+            initialContent.classList.add('hidden');
+            messageScreen.classList.add('active');
+            noBtn.style.display = 'none';
+            messageIndex = 0;
+            messageText.textContent = messages[messageIndex];
+            nextBtn.textContent = messages.length > 1 ? 'Next 💌' : 'Celebrate 🎉';
+        });
 
-                // After showing the final message, change the Yes button label to indicate final step
-                if (messageIndex === messages.length) {
-                    yesBtn.textContent = 'Celebrate 🎉';
+        // Advance messages; final click triggers celebration
+        nextBtn.addEventListener('click', () => {
+            if (messageIndex < messages.length - 1) {
+                messageIndex++;
+                messageText.textContent = messages[messageIndex];
+                if (messageIndex === messages.length - 1) {
+                    nextBtn.textContent = 'Celebrate 🎉';
                 }
             } else {
-                // All messages shown -> show celebration
-                initialContent.classList.add('hidden');
+                messageScreen.classList.remove('active');
                 celebration.classList.add('active');
-                noBtn.style.display = 'none';
                 triggerConfetti();
             }
         });
